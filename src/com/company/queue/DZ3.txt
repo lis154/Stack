@@ -1,0 +1,372 @@
+Stack + Обратная строка 
+
+public class Stack {
+
+    private int maxSize;
+    private int[] stack;
+    private int head;
+
+
+    public Stack(int size) {
+        this.maxSize = size;
+        this.stack = new int[size];
+        this.head = -1;
+
+    }
+
+    public boolean isEmpty(){
+        return head == -1;
+    }
+
+    public boolean isFull(){
+        return head == maxSize-1;
+    }
+
+    public boolean push(int value)
+    {
+        if (isFull()) return false;
+        stack[++head] = value;
+        return true;
+    }
+
+    public int pop()
+    {
+        if (isEmpty()) throw new RuntimeException("Stack is empty");
+        return stack[head--];
+    }
+
+    public int peek()
+    {
+        if (isEmpty()) throw new RuntimeException("Stack is empty");
+        return stack[head];
+    }
+
+    public String reverse() // обратная строка
+    {
+        String new_str="";
+        for (int i = 0; i < stack.length; i++) {
+            new_str = new_str + (char)pop();
+        }
+        return new_str;
+    }
+
+    public static void main(String[] args) {
+	String s = "123456789";
+        Stack stack = new Stack(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            stack.push(s.charAt(i));
+        }
+        System.out.println(s);
+        String str = stack.reverse();
+        System.out.println(str); // обратная строка
+        //Brackets.check(s);
+    }
+}
+
+
+-------------------------------------------------------------------
+ДЕК
+
+/**
+ * Created by i.lapshinov on 27.05.2018.
+ */
+public class Dek {
+    private int maxSize;
+    private int[] queue;
+    private int head; // указатель на голову
+    private int tail; // указатель на хвост
+    private int items; // текущая наполнение
+
+    public Dek(int size) {
+        this.maxSize = size;
+        queue = new int[size];
+        head = 0;// указатель на голову
+        tail = -1;// указатель на хвост
+        items = 0;// текущая наполнение
+    }
+
+    public boolean isEmpty(){
+        return items == 0;
+    }
+
+    public boolean isFull(){
+        return items == maxSize;
+    }
+
+    public int size(){
+        return items;
+    }
+
+    public void insert_right(int i)
+    {
+        if (isFull())
+        {
+            maxSize *= 2;
+            int[] temp = new int[maxSize];
+            if (tail >= head){
+                System.arraycopy(queue, 0, temp, 0, queue.length); // копируем в новый больший массив
+            }
+            else{
+                System.arraycopy(queue, 0, temp, 0, tail + 1);
+                System.arraycopy(queue, head, temp,maxSize-(queue.length-head),queue.length - head); // копируем между головой и хвостом
+                head = maxSize - head -1;
+            }
+            queue = temp;
+
+
+        }
+        if (tail == maxSize - 1) // цикличность если массив не полон
+            tail = -1;
+        queue[++tail] = i;
+        items++;
+
+    }
+
+    public int remove_right(){
+        if (isEmpty()) throw new RuntimeException("Queue is empty");
+        int temp = queue[head++];
+
+        if (head == maxSize)
+            head = 0;
+        items--;
+        return temp;
+    }
+
+    public void insert_left(int i)
+    {
+        if (!isFull())
+        {
+            if (head == 0 ) // если не полный и первый элемент в 0
+            {
+              //  System.arraycopy(queue, 0, queue, 1, tail);
+              //  queue[head] = i;
+                head = maxSize-1;
+                queue[head] = i;
+                items++;
+
+            }
+            else
+                queue[--head] = i;
+                items++;
+        }
+        else
+        {
+            int[] temp = new int[maxSize*2];
+            if (head < tail)
+            {
+
+                //System.arraycopy(queue, 0, temp, 1, tail); // копирование массива на 1 вправо
+               // temp[head] = i;
+                head = maxSize-1;
+                queue[head] = i;
+                items++;
+
+            }
+            if (head > tail)
+            {
+                System.arraycopy(queue,0,temp,0,tail);
+                System.arraycopy(queue, head, temp,maxSize-(queue.length-head),queue.length - head);
+                temp[--head] = i;// копируем между головой и хвостом
+                items++;
+                queue = temp;
+
+            }
+
+        }
+    }
+
+    public int remove_left(){
+        if (isEmpty()) throw new RuntimeException("Queue is empty");
+        int temp = queue[tail--];
+
+        if (tail == 0)
+            tail = -1;
+        items--;
+        return temp;
+    }
+
+    public int peek(){
+        return queue[head];
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------
+Приоритетная очередь
+
+/**
+ * Created by i.lapshinov on 28.05.2018.
+ */
+public class PriorityQ {
+    int priority;
+    int date;
+
+    public PriorityQ(int priority, int date) {
+        this.priority = priority;
+        this.date = date;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+}
+
+
+**
+ * Created by i.lapshinov on 27.05.2018.
+ */
+public class PriorityQueue {
+    private int maxSize;
+    private PriorityQ[] queue;
+    private int head; // указатель на голову
+    private int tail; // указатель на хвост
+    private int items; // текущая наполнение
+
+    public PriorityQueue(int size) {
+        this.maxSize = size;
+        queue = new PriorityQ[size];
+        head = 0;
+        tail = -1;
+        items = 0;
+    }
+
+    public boolean isEmpty(){
+        return items == 0;
+    }
+
+    public boolean isFull(){
+        return items == maxSize;
+    }
+
+    public int size(){
+        return items;
+    }
+
+    public void insert(PriorityQ elem)
+    {
+        if (!(isFull()))
+        {
+            if (head < tail) // копируем элементы с большим приоритетом вправо
+            {
+                for (int i = head; i <= tail; i++)
+                {
+                    if(elem.getPriority() > queue[i].getPriority())
+                    {
+                        if (tail != maxSize -1) { // если tail последний элемент в массиве
+                            System.arraycopy(queue, i, queue, i + 1, tail - i);
+                            queue[i] = elem;
+                            items++;
+                            break;
+                        }
+                        else
+                        {
+                            queue[0] = queue[maxSize-1];
+                            System.arraycopy(queue, i, queue,i+1, tail-i);
+                            queue[i] = elem;
+                            break;
+                        }
+                    }
+                }
+            }
+            else // если tail < head
+            {
+                boolean st = false;
+                for (int i = head; i < maxSize; i++) // поиск от head до maxSize
+                {
+                    if (elem.getPriority() > queue[i].getPriority())
+                    {
+                        System.arraycopy(queue, head, queue, head-1, head-i);
+                        queue[i] = elem;
+                        items++;
+                        st = true;
+                        break;
+                    }
+                }
+                if (st == false)
+                {
+                    for (int i = 0; i < tail; i++) // поиск от 0 до tail
+                    {
+                        if (elem.getPriority() > queue[i].getPriority())
+                        {
+                            System.arraycopy(queue, i, queue, i+1, tail-i);
+                            queue[i] = elem;
+                            items++;
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+        else
+        {
+            PriorityQ[] temp = new PriorityQ[maxSize*2];
+            if (head < tail)
+            {
+                for (int i = head; i <= tail; i++)
+                {
+                    if(elem.getPriority() < queue[i].getPriority())
+                    {
+                        System.arraycopy(queue, 0, temp, 0 ,i-1); //  копируем новый массив и добавляем элемент
+                        temp[i] = elem;
+                        System.arraycopy(queue, i, temp, i+1, tail-i);
+                        queue = temp;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                boolean st = false;
+                for (int i = head; i< maxSize; i++) { // если приоритет от head до maxSize
+                    if (elem.getPriority() < queue[i].getPriority()) {
+                        System.arraycopy(queue, 0, temp, 0, i - 1);
+                        temp[i] = elem;
+                        System.arraycopy(queue, i, temp, i + 1, maxSize - i);
+                        items++;
+                        st = true;
+                        queue = temp;
+                        break;
+                    }
+                }
+                if (st = false) {
+                    for (int i = 0; i < tail; i++) { // если приоритет от 0 До tail
+                        if (elem.getPriority() < queue[i].getPriority()) {
+                            System.arraycopy(queue, 0, temp, 0, i - 1);
+                            temp[i] = elem;
+                            System.arraycopy(queue, i, temp, i + 1, maxSize - i);
+                            items++;
+                            queue = temp;
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    public PriorityQ remove(){
+        if (isEmpty()) throw new RuntimeException("Queue is empty");
+        PriorityQ temp = queue[head++];
+
+        if (head == maxSize)
+            head = 0;
+        items--;
+        return temp;
+    }
+
+    public PriorityQ peek(){
+        return queue[head];
+    }
+
+    public boolean sravn(PriorityQ one_el, PriorityQ two_el) // сравниваем приоритеты
+    {
+        if (one_el.getPriority() > two_el.getPriority())
+            return true;
+        else
+            return false;
+    }
+
+}
